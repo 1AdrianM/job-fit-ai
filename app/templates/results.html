@@ -1,0 +1,116 @@
+<div class="bg-white rounded-lg shadow-xl p-8 space-y-8">
+    <!-- Fit Score -->
+    <div class="text-center border-b pb-6">
+        <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white mb-4">
+            <span class="text-5xl font-bold">{{ analysis.fit_score|int }}%</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Job Fit Score</h3>
+        <p class="text-gray-600">{{ analysis.reasoning }}</p>
+    </div>
+
+    <!-- Strengths -->
+    <div>
+        <h4 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-2xl mr-2">✅</span> Your Strengths
+        </h4>
+        <ul class="space-y-2">
+            {% for strength in analysis.strengths %}
+            <li class="flex items-start">
+                <span class="text-green-500 mr-2">•</span>
+                <span class="text-gray-700">{{ strength }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Matching Skills -->
+    <div>
+        <h4 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-2xl mr-2">🎯</span> Matching Skills
+        </h4>
+        <div class="flex flex-wrap gap-2">
+            {% for skill in analysis.matching_skills %}
+            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                {{ skill }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Missing Skills -->
+    {% if analysis.missing_skills %}
+    <div>
+        <h4 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-2xl mr-2">📚</span> Skills to Develop
+        </h4>
+        <div class="flex flex-wrap gap-2">
+            {% for skill in analysis.missing_skills %}
+            <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+                {{ skill }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Concerns -->
+    {% if analysis.concerns %}
+    <div>
+        <h4 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-2xl mr-2">⚠️</span> Potential Concerns
+        </h4>
+        <ul class="space-y-2">
+            {% for concern in analysis.concerns %}
+            <li class="flex items-start">
+                <span class="text-orange-500 mr-2">•</span>
+                <span class="text-gray-700">{{ concern }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Cover Letter -->
+    <div class="border-t pt-6">
+        <h4 class="text-xl font-semibold text-gray-900 mb-4 flex items-center justify-between">
+            <span>
+                <span class="text-2xl mr-2">✍️</span> Generated Cover Letter
+            </span>
+            <button 
+                onclick="copyToClipboard()"
+                class="text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-200 transition-colors"
+            >
+                📋 Copy
+            </button>
+        </h4>
+        <div id="cover-letter" class="bg-gray-50 p-6 rounded-lg text-gray-800 whitespace-pre-wrap font-serif leading-relaxed">{{ cover_letter.content }}</div>
+        <p class="text-sm text-gray-500 mt-4">{{ cover_letter.word_count }} words | {{ cover_letter.tone }} tone</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-4 pt-6 border-t">
+        <button 
+            onclick="window.print()"
+            class="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+            🖨️ Print
+        </button>
+        <button 
+            onclick="location.reload()"
+            class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+        >
+            ↻ Analyze Another Job
+        </button>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.getElementById('cover-letter').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Cover letter copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+</script>

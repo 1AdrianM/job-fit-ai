@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Fit AI - Intelligent Job Analysis</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-3xl">🎯</span>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Job Fit AI
+                    </h1>
+                </div>
+                <span class="text-sm text-gray-500">by Adrian Mateo</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                Smart CV Analysis & Cover Letters
+            </h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Paste your CV and any job description to get instant AI-powered analysis: 
+                fit score, matching skills, gaps, and a personalized cover letter.
+            </p>
+        </div>
+
+        <!-- Analysis Form -->
+        <div class="max-w-4xl mx-auto">
+            <form 
+                hx-post="/api/analyze" 
+                hx-target="#results"
+                hx-swap="innerHTML"
+                hx-indicator="#loading"
+                class="space-y-6"
+            >
+                <!-- CV Input -->
+                <div>
+                    <label for="cv" class="block text-sm font-medium text-gray-700 mb-2">
+                        Your CV / Resume
+                    </label>
+                    <textarea
+                        id="cv"
+                        name="cv"
+                        rows="8"
+                        required
+                        placeholder="Paste your CV/resume here...
+
+Example:
+Adrian Mateo
+Backend Developer | 2 years experience
+
+SKILLS:
+Java, Spring Boot, Python, FastAPI, PostgreSQL, Docker
+
+EXPERIENCE:
+- Built fraud detection system with Java/Spring Boot
+- Developed RESTful APIs serving 10k+ requests/day
+- Worked with microservices and cloud platforms
+
+PROJECTS:
+- SentinelPay: Fraud detection system
+- Job Fit AI: AI-powered job matching tool
+                        "
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none font-mono text-sm"
+                    ></textarea>
+                </div>
+
+                <!-- Job Description Input -->
+                <div>
+                    <label for="job_description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Job Description
+                    </label>
+                    <textarea
+                        id="job_description"
+                        name="job_description"
+                        rows="10"
+                        required
+                        placeholder="Paste the full job description here...
+
+Example:
+Junior Backend Developer - Remote
+Company: TechCorp Inc.
+
+We're looking for a backend engineer with 2+ years experience in Java/Spring Boot.
+
+Requirements:
+- Strong Java and Spring Boot experience
+- RESTful API design
+- PostgreSQL or similar SQL database
+- Docker and containerization
+- Excellent problem-solving skills
+
+Nice to have:
+- Cloud platform experience (AWS, GCP)
+- Python knowledge
+- Microservices architecture
+                        "
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none font-mono text-sm"
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                    <span id="submit-text">🚀 Analyze Job Fit</span>
+                </button>
+            </form>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="htmx-indicator text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+                <p class="mt-4 text-gray-600">Analyzing with AI... (may take 10-20 seconds)</p>
+            </div>
+
+            <!-- Results Container -->
+            <div id="results" class="results mt-12"></div>
+        </div>
+
+        <!-- Features -->
+        <div class="max-w-4xl mx-auto mt-20 grid md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="text-4xl mb-4">📊</div>
+                <h3 class="font-semibold text-lg mb-2">Fit Score</h3>
+                <p class="text-gray-600 text-sm">Get a 0-100% match score based on your experience</p>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl mb-4">✍️</div>
+                <h3 class="font-semibold text-lg mb-2">Cover Letter Generation</h3>
+                <p class="text-gray-600 text-sm">AI-generated, personalized cover letters in seconds</p>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl mb-4">🔍</div>
+                <h3 class="font-semibold text-lg mb-2">Gap Identification</h3>
+                <p class="text-gray-600 text-sm">See what skills you're missing and how to address them</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 mt-20 text-gray-500 text-sm">
+        <p>Built with FastAPI + Google Gemini | 
+            <a href="https://github.com/1AdrianM/job-fit-ai" class="text-indigo-600 hover:underline">View on GitHub</a>
+        </p>
+    </footer>
+
+    <style>
+        .htmx-indicator {
+            display: none;
+        }
+        .htmx-request .htmx-indicator {
+            display: block;
+        }
+        .htmx-request #submit-text {
+            opacity: 0.5;
+        }
+    </style>
+</body>
+</html>
