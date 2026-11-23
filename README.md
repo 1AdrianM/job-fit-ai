@@ -1,8 +1,11 @@
 # 🎯 Job Fit AI - Intelligent Job Application Assistant
 
+[![CI/CD Pipeline](https://github.com/1AdrianM/job-fit-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/1AdrianM/job-fit-ai/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-17%20passing-brightgreen)](https://github.com/1AdrianM/job-fit-ai/actions)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Playwright](https://img.shields.io/badge/Playwright-E2E-45ba4b?style=for-the-badge&logo=playwright)](https://playwright.dev/)
 
 **AI-powered tool to analyze job fit, generate tailored cover letters, and accelerate your job search.**
 
@@ -174,6 +177,30 @@ npm run test:report
 - Performance monitoring
 
 See [tests/README.md](tests/README.md) for detailed documentation.
+
+---
+
+## 🔄 CI/CD Pipeline
+
+Automated testing and deployment with GitHub Actions:
+
+**On every push/PR:**
+- ✅ Run 17 Playwright E2E tests
+- ✅ Code quality checks (Ruff linting)
+- ✅ Security vulnerability scanning (Trivy)
+- ✅ Generate test reports and screenshots
+
+**On main branch push:**
+- 🚀 Auto-deploy to Railway (when configured)
+- 📊 Update test status badges
+
+**GitHub Secrets required:**
+- `GEMINI_API_KEY`: Your Google Gemini API key
+- `RAILWAY_TOKEN`: Railway deployment token (optional)
+- `GIST_TOKEN`: GitHub token for badge updates (optional)
+- `GIST_ID`: Gist ID for badge storage (optional)
+
+**View pipeline:** [Actions tab](https://github.com/1AdrianM/job-fit-ai/actions)
 
 ---
 
