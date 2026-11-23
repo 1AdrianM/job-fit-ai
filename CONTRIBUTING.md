@@ -2,6 +2,28 @@
 
 Thanks for your interest in contributing! 🎉
 
+## 🌳 Git Flow Branching Strategy
+
+We use **Git Flow** for organized development. Please read [GITFLOW.md](GITFLOW.md) for complete details.
+
+### Quick Start
+
+**Working on a new feature?**
+
+```bash
+# Start a new feature
+./scripts/gitflow.sh feature start my-awesome-feature
+
+# Or manually:
+git checkout develop
+git pull origin develop
+git checkout -b feature/my-awesome-feature
+```
+
+**All changes go through develop first, then to main.**
+
+---
+
 ## Development Setup
 
 1. **Fork and clone**
