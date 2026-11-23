@@ -45,10 +45,11 @@ Job searching is time-consuming. For every opening, you need to:
 ## 🛠️ Tech Stack
 
 - **Backend**: FastAPI (Python 3.11+)
-- **LLM**: Google Gemini 1.5 Pro (best for text analysis, free tier)
+- **LLM**: Google Gemini 1.5 Flash (best for text analysis, free tier)
 - **Frontend**: HTMX + TailwindCSS (simple, reactive)
+- **Testing**: Playwright (E2E, API, accessibility)
 - **Database**: SQLite (MVP) → PostgreSQL (production)
-- **Deployment**: Railway (free tier)
+- **Deployment**: Render (free tier)
 
 ---
 
@@ -191,12 +192,12 @@ Automated testing and deployment with GitHub Actions:
 - ✅ Generate test reports and screenshots
 
 **On main branch push:**
-- 🚀 Auto-deploy to Railway (when configured)
+- 🚀 Auto-deploy to Render (when configured)
 - 📊 Update test status badges
 
 **GitHub Secrets required:**
 - `GEMINI_API_KEY`: Your Google Gemini API key
-- `RAILWAY_TOKEN`: Railway deployment token (optional)
+- `RENDER_API_KEY`: Render API key (optional for auto-deploy)
 - `GIST_TOKEN`: GitHub token for badge updates (optional)
 - `GIST_ID`: Gist ID for badge storage (optional)
 
