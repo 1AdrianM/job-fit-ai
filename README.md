@@ -148,7 +148,39 @@ MIT License - feel free to use this for your own job search!
 
 ---
 
-## 🤝 Contributing
+## 🔄 Development Workflow
+
+**Complete development loop documentation:** [DEVELOPMENT_LOOP.md](DEVELOPMENT_LOOP.md)
+
+**Quick start:**
+
+```bash
+# 1. Start new feature
+./scripts/gitflow.sh feature start my-feature
+
+# 2. Start dev server
+./scripts/dev.sh start
+
+# 3. Make changes, then run quality checks
+./scripts/dev.sh quality
+
+# 4. Commit and push
+git add .
+git commit -m "feat: add awesome feature"
+./scripts/gitflow.sh feature finish
+
+# 5. Create PR on GitHub
+# 6. CI runs automatically
+# 7. Merge to develop → main
+# 8. Auto-deploys to Render
+```
+
+**Helper scripts:**
+- `./scripts/gitflow.sh` - Git Flow operations
+- `./scripts/dev.sh` - Development tasks
+- See [DEVELOPMENT_LOOP.md](DEVELOPMENT_LOOP.md) for complete guide
+
+---
 
 We use **Git Flow** branching strategy for organized development.
 
