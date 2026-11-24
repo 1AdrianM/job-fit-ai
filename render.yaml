@@ -2,6 +2,7 @@ services:
   - type: web
     name: job-fit-ai
     runtime: python
+    pythonVersion: 3.12.0
     region: oregon
     plan: free
     branch: main
