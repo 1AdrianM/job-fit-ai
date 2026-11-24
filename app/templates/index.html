@@ -3,59 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Fit AI - Intelligent Job Analysis</title>
+    <title>Job Fit AI - Professional Job Analysis</title>
+    
+    <!-- Geist Font (Vercel) -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            /* Vercel + Notion Color System */
+            --color-bg: #ffffff;
+            --color-bg-warm: #f6f5f4;
+            --color-text-primary: #171717;
+            --color-text-secondary: #615d59;
+            --color-text-muted: #a39e98;
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-accent: #0075de;
+            --color-accent-hover: #005bab;
+            
+            /* Spacing (8px base) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            --space-7: 48px;
+            --space-8: 64px;
+            
+            /* Shadows (Vercel shadow-as-border + Notion depth) */
+            --shadow-border: 0px 0px 0px 1px var(--color-border);
+            --shadow-card: 0px 0px 0px 1px var(--color-border),
+                           rgba(0,0,0,0.04) 0px 2px 2px,
+                           rgba(0,0,0,0.02) 0px 0.8px 2.925px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Geist', system-ui, -apple-system, sans-serif;
+            color: var(--color-text-primary);
+            background: var(--color-bg);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Typography */
+        .display {
+            font-size: 48px;
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -2.4px;
+        }
+        
+        .heading-lg {
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.25;
+            letter-spacing: -1.28px;
+        }
+        
+        .heading-md {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.33;
+            letter-spacing: -0.96px;
+        }
+        
+        .body {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--color-text-secondary);
+        }
+        
+        .body-large {
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--color-text-secondary);
+        }
+        
+        .label {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.14px;
+        }
+        
+        .mono {
+            font-family: 'Geist Mono', ui-monospace, monospace;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+        
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-4);
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 var(--space-6);
+            }
+        }
+        
+        /* Header */
+        header {
+            border-bottom: var(--shadow-border);
+            background: var(--color-bg);
+        }
+        
+        .header-content {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.36px;
+        }
+        
+        .header-credit {
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: var(--space-8) 0;
+            text-align: center;
+        }
+        
+        .hero-title {
+            margin-bottom: var(--space-4);
+        }
+        
+        .hero-description {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+        
+        /* Form Section */
+        .form-section {
+            padding: var(--space-8) 0;
+            background: var(--color-bg-warm);
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            background: var(--color-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            padding: var(--space-6);
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-5);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-2);
+            color: var(--color-text-primary);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border-radius: 8px;
+            border: none;
+            box-shadow: var(--shadow-border);
+            font-family: 'Geist Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: var(--color-bg);
+            resize: vertical;
+            transition: box-shadow 0.2s;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            box-shadow: 0px 0px 0px 2px var(--color-accent);
+        }
+        
+        .form-textarea::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        /* Button */
+        .button-primary {
+            width: 100%;
+            padding: var(--space-4);
+            border-radius: 8px;
+            border: none;
+            background: var(--color-text-primary);
+            color: var(--color-bg);
+            font-family: 'Geist', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: -0.16px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        
+        .button-primary:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+        
+        .button-primary:active {
+            transform: translateY(0);
+        }
+        
+        /* Loading */
+        .loading-container {
+            display: none;
+            padding: var(--space-6);
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--color-bg-warm);
+            border-top-color: var(--color-text-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto var(--space-3);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: var(--color-text-secondary);
+        }
+        
+        /* Features */
+        .features {
+            padding: var(--space-8) 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            gap: var(--space-5);
+            grid-template-columns: 1fr;
+        }
+        
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: var(--space-5);
+        }
+        
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-3);
+            opacity: 0.9;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.36px;
+            margin-bottom: var(--space-2);
+        }
+        
+        .feature-description {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        footer {
+            padding: var(--space-6) 0;
+            text-align: center;
+            border-top: var(--shadow-border);
+        }
+        
+        .footer-text {
+            color: var(--color-text-muted);
+            font-size: 13px;
+        }
+        
+        .footer-link {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Results */
+        #results {
+            margin-top: var(--space-6);
+        }
+        
+        /* HTMX States */
+        .htmx-request .loading-container {
+            display: block;
+        }
+        
+        .htmx-request .button-primary {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+<body>
     <!-- Header -->
-    <nav class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span class="text-3xl">🎯</span>
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                        Job Fit AI
-                    </h1>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span style="font-size: 20px;">🎯</span>
+                    <span class="logo-text">Job Fit AI</span>
                 </div>
-                <span class="text-sm text-gray-500">by Adrian Mateo</span>
+                <span class="header-credit">by Adrian Mateo</span>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold text-gray-900 mb-4">
-                Smart CV Analysis & Cover Letters
-            </h2>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Paste your CV and any job description to get instant AI-powered analysis: 
-                fit score, matching skills, gaps, and a personalized cover letter.
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="display hero-title">
+                Professional Job Analysis
+            </h1>
+            <p class="body-large hero-description">
+                Match your CV against any job description. Get instant fit scores, 
+                skill analysis, and personalized cover letters powered by AI.
             </p>
         </div>
+    </section>
 
-        <!-- Analysis Form -->
-        <div class="max-w-4xl mx-auto">
-            <form 
-                hx-post="/api/analyze" 
-                hx-target="#results"
-                hx-swap="innerHTML"
-                hx-indicator="#loading"
-                class="space-y-6"
-            >
-                <!-- CV Input -->
-                <div>
-                    <label for="cv" class="block text-sm font-medium text-gray-700 mb-2">
-                        Your CV / Resume
-                    </label>
-                    <textarea
-                        id="cv"
-                        name="cv"
-                        rows="8"
-                        required
-                        placeholder="Paste your CV/resume here...
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-container">
+                <form 
+                    hx-post="/api/analyze" 
+                    hx-target="#results"
+                    hx-swap="innerHTML"
+                    class="form-card"
+                >
+                    <div class="form-group">
+                        <label for="cv" class="label form-label">
+                            Your CV / Resume
+                        </label>
+                        <textarea
+                            id="cv"
+                            name="cv"
+                            rows="10"
+                            required
+                            placeholder="Paste your CV here...
 
 Example:
 Adrian Mateo
@@ -71,29 +403,27 @@ EXPERIENCE:
 
 PROJECTS:
 - SentinelPay: Fraud detection system
-- Job Fit AI: AI-powered job matching tool
-                        "
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none font-mono text-sm"
-                    ></textarea>
-                </div>
+- Job Fit AI: AI-powered job matching tool"
+                            class="form-textarea mono"
+                        ></textarea>
+                    </div>
 
-                <!-- Job Description Input -->
-                <div>
-                    <label for="job_description" class="block text-sm font-medium text-gray-700 mb-2">
-                        Job Description
-                    </label>
-                    <textarea
-                        id="job_description"
-                        name="job_description"
-                        rows="10"
-                        required
-                        placeholder="Paste the full job description here...
+                    <div class="form-group">
+                        <label for="job_description" class="label form-label">
+                            Job Description
+                        </label>
+                        <textarea
+                            id="job_description"
+                            name="job_description"
+                            rows="12"
+                            required
+                            placeholder="Paste the full job description here...
 
 Example:
 Junior Backend Developer - Remote
 Company: TechCorp Inc.
 
-We're looking for a backend engineer with 2+ years experience in Java/Spring Boot.
+We're looking for a backend engineer with 2+ years experience.
 
 Requirements:
 - Strong Java and Spring Boot experience
@@ -105,67 +435,63 @@ Requirements:
 Nice to have:
 - Cloud platform experience (AWS, GCP)
 - Python knowledge
-- Microservices architecture
-                        "
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none font-mono text-sm"
-                    ></textarea>
+- Microservices architecture"
+                            class="form-textarea mono"
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="button-primary">
+                        Analyze Job Fit
+                    </button>
+
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Analyzing with AI... (10-20 seconds)</p>
+                    </div>
+                </form>
+
+                <div id="results"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Fit Score</h3>
+                    <p class="feature-description">
+                        0-100% match score based on your experience and skills
+                    </p>
                 </div>
-
-                <button
-                    type="submit"
-                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                    <span id="submit-text">🚀 Analyze Job Fit</span>
-                </button>
-            </form>
-
-            <!-- Loading Indicator -->
-            <div id="loading" class="htmx-indicator text-center py-8">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-                <p class="mt-4 text-gray-600">Analyzing with AI... (may take 10-20 seconds)</p>
-            </div>
-
-            <!-- Results Container -->
-            <div id="results" class="results mt-12"></div>
-        </div>
-
-        <!-- Features -->
-        <div class="max-w-4xl mx-auto mt-20 grid md:grid-cols-3 gap-8">
-            <div class="text-center">
-                <div class="text-4xl mb-4">📊</div>
-                <h3 class="font-semibold text-lg mb-2">Fit Score</h3>
-                <p class="text-gray-600 text-sm">Get a 0-100% match score based on your experience</p>
-            </div>
-            <div class="text-center">
-                <div class="text-4xl mb-4">✍️</div>
-                <h3 class="font-semibold text-lg mb-2">Cover Letter Generation</h3>
-                <p class="text-gray-600 text-sm">AI-generated, personalized cover letters in seconds</p>
-            </div>
-            <div class="text-center">
-                <div class="text-4xl mb-4">🔍</div>
-                <h3 class="font-semibold text-lg mb-2">Gap Identification</h3>
-                <p class="text-gray-600 text-sm">See what skills you're missing and how to address them</p>
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h3 class="feature-title">Cover Letter</h3>
+                    <p class="feature-description">
+                        AI-generated, personalized cover letters in seconds
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Gap Analysis</h3>
+                    <p class="feature-description">
+                        Identify missing skills and how to address them
+                    </p>
+                </div>
             </div>
         </div>
-    </main>
+    </section>
 
     <!-- Footer -->
-    <footer class="text-center py-8 mt-20 text-gray-500 text-sm">
-        <p>Built with FastAPI + Google Gemini | 
-            <a href="https://github.com/1AdrianM/job-fit-ai" class="text-indigo-600 hover:underline">View on GitHub</a>
-        </p>
+    <footer>
+        <div class="container">
+            <p class="footer-text">
+                Built with FastAPI + Google Gemini | 
+                <a href="https://github.com/1AdrianM/job-fit-ai" class="footer-link">View on GitHub</a>
+            </p>
+        </div>
     </footer>
-
-    <style>
-        .htmx-indicator {
-            display: none;
-        }
-        .htmx-request .htmx-indicator {
-            display: block;
-        }
-        .htmx-request #submit-text {
-            opacity: 0.5;
-        }
-    </style>
 </body>
 </html>
