@@ -1,0 +1,35 @@
+# Ruff configuration for Job Fit AI
+
+# Line length
+line-length = 100
+
+# Directories to exclude
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "node_modules",
+    "build",
+    "dist",
+    ".pytest_cache",
+]
+
+# Linting rules
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+]
+
+ignore = [
+    "EXE002",  # Files are executable in NTFS, can't fix with chmod
+]
+
+# Format configuration
+[format]
+quote-style = "double"
+indent-style = "space"
