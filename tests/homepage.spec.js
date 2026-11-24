@@ -5,13 +5,13 @@ test.describe('Job Fit AI - Homepage', () => {
   test('should load homepage successfully', async ({ page }) => {
     await page.goto('/');
     
-    // Check title
+    // Check title (new Vercel+Notion design)
     await expect(page).toHaveTitle(/Job Fit AI/);
     
-    // Check main heading
+    // Check main heading (now "Professional Job Analysis")
     const h1 = page.locator('h1');
     await expect(h1).toBeVisible();
-    await expect(h1).toContainText('Job Fit AI');
+    await expect(h1).toContainText('Professional Job Analysis');
   });
 
   test('should have analysis form with required fields', async ({ page }) => {
