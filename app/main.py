@@ -3,7 +3,7 @@ Job Fit AI - FastAPI Application
 """
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from app.config import get_settings
 from app.models import CVData, JobAnalysisRequest, JobAnalysisResponse, JobDescription
 from app.services.ai_service import AIService
+from app.services.cv_parser_service import CVParserService
 from app.services.scraper_service import JobScraperService
 
 # Initialize app
@@ -26,6 +27,7 @@ templates = Jinja2Templates(directory="app/templates")
 # Initialize AI service
 ai_service = AIService()
 scraper_service = JobScraperService()
+cv_parser_service = CVParserService()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -126,6 +128,45 @@ async def analyze_job(request: Request, job_data: JobAnalysisRequest):
 
     # Return JSON for direct API calls
     return JobAnalysisResponse(job=job, analysis=analysis, cover_letter=cover_letter)
+
+
+@app.post("/api/upload-cv")
+async def upload_cv(file: UploadFile = File(...)):
+    """
+    Upload and parse CV file (PDF or DOCX).
+
+    Accepts a CV file upload and returns the extracted text.
+    """
+    # Validate file
+    is_valid, error_message = cv_parser_service.validate_file(
+        file.content_type or "", file.size or 0
+    )
+
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=error_message)
+
+    # Read file content
+    try:
+        file_content = await file.read()
+
+        # Parse CV
+        cv_text = cv_parser_service.parse_cv(file_content, file.filename or "")
+
+        if not cv_text or len(cv_text.strip()) < 50:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Could not extract enough text from CV. "
+                    "Please ensure the file is not password-protected or corrupted."
+                ),
+            )
+
+        return JSONResponse({"success": True, "cv_text": cv_text, "filename": file.filename})
+
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing CV: {str(e)}")
 
 
 @app.post("/api/scrape-job")

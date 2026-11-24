@@ -17,8 +17,8 @@ test.describe('Job Fit AI - Homepage', () => {
   test('should have analysis form with required fields', async ({ page }) => {
     await page.goto('/');
     
-    // Check CV textarea
-    const cvField = page.locator('textarea[name="cv"]');
+    // Check CV textarea (visible paste method textarea)
+    const cvField = page.locator('#cv');
     await expect(cvField).toBeVisible();
     
     // Check job description textarea
