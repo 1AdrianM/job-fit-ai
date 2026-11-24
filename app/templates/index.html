@@ -22,6 +22,7 @@
             --color-border: rgba(0, 0, 0, 0.08);
             --color-accent: #0075de;
             --color-accent-hover: #005bab;
+            --color-success: #2a9d8f;
             
             /* Spacing (8px base) */
             --space-1: 4px;
@@ -133,6 +134,12 @@
             display: flex;
             align-items: center;
             gap: var(--space-2);
+        }
+        
+        .logo-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text-primary);
         }
         
         .logo-text {
@@ -286,8 +293,10 @@
         }
         
         .feature-icon {
-            font-size: 32px;
-            margin-bottom: var(--space-3);
+            width: 32px;
+            height: 32px;
+            margin: 0 auto var(--space-3);
+            color: var(--color-text-primary);
             opacity: 0.9;
         }
         
@@ -339,6 +348,40 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: var(--space-5);
+            right: var(--space-5);
+            background: var(--color-text-primary);
+            color: var(--color-bg);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        .toast-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--color-success);
+        }
     </style>
 </head>
 <body>
@@ -347,7 +390,12 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <span style="font-size: 20px;">🎯</span>
+                    <!-- Target Icon -->
+                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="6" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="2" stroke-width="2"/>
+                    </svg>
                     <span class="logo-text">Job Fit AI</span>
                 </div>
                 <span class="header-credit">by Adrian Mateo</span>
@@ -409,6 +457,39 @@ PROJECTS:
                     </div>
 
                     <div class="form-group">
+                        <label for="job_url" class="label form-label">
+                            Job URL (Optional)
+                        </label>
+                        <div style="display: flex; gap: 8px;">
+                            <input
+                                type="url"
+                                id="job_url"
+                                name="job_url"
+                                placeholder="Paste job URL from LinkedIn, Indeed, etc."
+                                style="flex: 1; padding: 12px; border-radius: 8px; border: none; box-shadow: var(--shadow-border); font-family: 'Geist', sans-serif; font-size: 14px; color: var(--color-text-primary); background: var(--color-bg); transition: box-shadow 0.2s;"
+                                onfocus="this.style.boxShadow='0px 0px 0px 2px var(--color-accent)'"
+                                onblur="this.style.boxShadow='var(--shadow-border)'"
+                            />
+                            <button
+                                type="button"
+                                id="scrape-btn"
+                                onclick="scrapeJob()"
+                                style="padding: 12px 24px; border-radius: 8px; border: none; background: var(--color-text-primary); color: var(--color-bg); font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap;"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.opacity='0.9'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'"
+                            >
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21 12a9 9 0 1 1-6.219-8.56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span id="scrape-text">Scrape</span>
+                            </button>
+                        </div>
+                        <p style="font-size: 12px; color: var(--color-text-muted); margin-top: 8px;">
+                            Supports: LinkedIn, Indeed, Greenhouse, Lever, and more
+                        </p>
+                    </div>
+
+                    <div class="form-group">
                         <label for="job_description" class="label form-label">
                             Job Description
                         </label>
@@ -460,21 +541,33 @@ Nice to have:
         <div class="container">
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
+                    <!-- Bar Chart Icon -->
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 3v18h18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18 17V9M13 17V5M8 17v-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     <h3 class="feature-title">Fit Score</h3>
                     <p class="feature-description">
                         0-100% match score based on your experience and skills
                     </p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">✍️</div>
+                    <!-- Edit Icon -->
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     <h3 class="feature-title">Cover Letter</h3>
                     <p class="feature-description">
                         AI-generated, personalized cover letters in seconds
                     </p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
+                    <!-- Search Icon -->
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="m21 21-4.35-4.35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     <h3 class="feature-title">Gap Analysis</h3>
                     <p class="feature-description">
                         Identify missing skills and how to address them
@@ -493,5 +586,86 @@ Nice to have:
             </p>
         </div>
     </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <!-- Check Icon -->
+        <svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M20 6 9 17l-5-5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        // Toast notification system
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+        
+        // Make showToast available globally
+        window.showToast = showToast;
+        
+        // Job URL scraping
+        async function scrapeJob() {
+            const urlInput = document.getElementById('job_url');
+            const scrapeBtn = document.getElementById('scrape-btn');
+            const scrapeText = document.getElementById('scrape-text');
+            const jobDescTextarea = document.getElementById('job_description');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showToast('Please enter a job URL');
+                urlInput.focus();
+                return;
+            }
+            
+            // Disable button and show loading
+            scrapeBtn.disabled = true;
+            scrapeText.textContent = 'Scraping...';
+            scrapeBtn.style.opacity = '0.6';
+            scrapeBtn.style.cursor = 'not-allowed';
+            
+            try {
+                const response = await fetch('/api/scrape-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Fill job description textarea
+                    jobDescTextarea.value = data.job_description;
+                    jobDescTextarea.focus();
+                    showToast('Job description extracted successfully!');
+                } else {
+                    throw new Error(data.detail || 'Failed to scrape job');
+                }
+            } catch (error) {
+                console.error('Scraping error:', error);
+                showToast(error.message || 'Failed to scrape job. Try copying manually.');
+            } finally {
+                // Re-enable button
+                scrapeBtn.disabled = false;
+                scrapeText.textContent = 'Scrape';
+                scrapeBtn.style.opacity = '1';
+                scrapeBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // Make scrapeJob available globally
+        window.scrapeJob = scrapeJob;
+    </script>
 </body>
 </html>
