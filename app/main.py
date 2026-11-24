@@ -12,6 +12,7 @@ from app.config import get_settings
 from app.models import CVData, JobAnalysisRequest, JobAnalysisResponse, JobDescription
 from app.services.ai_service import AIService
 from app.services.cv_parser_service import CVParserService
+from app.services.history_service import HistoryService
 from app.services.scraper_service import JobScraperService
 
 # Initialize app
@@ -28,6 +29,7 @@ templates = Jinja2Templates(directory="app/templates")
 ai_service = AIService()
 scraper_service = JobScraperService()
 cv_parser_service = CVParserService()
+history_service = HistoryService()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -117,6 +119,14 @@ async def analyze_job(request: Request, job_data: JobAnalysisRequest):
 
     # Generate cover letter
     cover_letter = await ai_service.generate_cover_letter(cv, job, analysis)
+
+    # Save to history
+    history_service.save_analysis(
+        cv_text=job_data.cv,
+        job_description=job_data.job_description,
+        analysis=analysis,
+        cover_letter=cover_letter,
+    )
 
     # Check if request is from HTMX
     if request.headers.get("HX-Request"):
@@ -221,6 +231,49 @@ async def scrape_job(request: Request):
         raise HTTPException(status_code=502, detail=f"Failed to fetch job posting: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error scraping job: {str(e)}")
+
+
+@app.get("/api/history")
+async def get_history(limit: int = 20):
+    """
+    Get list of recent job analyses.
+
+    Returns a list of analysis summaries sorted by most recent first.
+    """
+    try:
+        history = history_service.get_history(limit=limit)
+        return JSONResponse({"success": True, "history": history})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving history: {str(e)}")
+
+
+@app.get("/api/history/{analysis_id}")
+async def get_analysis(analysis_id: str):
+    """
+    Get a specific analysis by ID.
+
+    Returns the full analysis data including CV, job description,
+    analysis results, and cover letter.
+    """
+    analysis = history_service.get_analysis(analysis_id)
+
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    return JSONResponse({"success": True, "analysis": analysis})
+
+
+@app.delete("/api/history/{analysis_id}")
+async def delete_analysis(analysis_id: str):
+    """
+    Delete a specific analysis from history.
+    """
+    deleted = history_service.delete_analysis(analysis_id)
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    return JSONResponse({"success": True, "message": "Analysis deleted"})
 
 
 @app.get("/health")
