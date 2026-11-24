@@ -2,14 +2,16 @@
 Job Fit AI - FastAPI Application
 """
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+import httpx
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.config import get_settings
 from app.models import CVData, JobAnalysisRequest, JobAnalysisResponse, JobDescription
 from app.services.ai_service import AIService
+from app.services.scraper_service import JobScraperService
 
 # Initialize app
 settings = get_settings()
@@ -23,6 +25,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 # Initialize AI service
 ai_service = AIService()
+scraper_service = JobScraperService()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -123,6 +126,60 @@ async def analyze_job(request: Request, job_data: JobAnalysisRequest):
 
     # Return JSON for direct API calls
     return JobAnalysisResponse(job=job, analysis=analysis, cover_letter=cover_letter)
+
+
+@app.post("/api/scrape-job")
+async def scrape_job(request: Request):
+    """
+    Scrape job description from a URL.
+
+    Accepts a job posting URL and returns the extracted job description.
+    """
+    data = await request.json()
+    job_url = data.get("url", "").strip()
+
+    if not job_url:
+        raise HTTPException(status_code=400, detail="URL is required")
+
+    # Validate URL
+    if not scraper_service.validate_url(job_url):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid or unsupported job posting URL. "
+                "Supported platforms: LinkedIn, Indeed, Greenhouse, Lever, and others."
+            ),
+        )
+
+    try:
+        # Fetch the page
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
+            response = await client.get(
+                job_url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                },
+            )
+            response.raise_for_status()
+
+        # Extract job description
+        job_description = scraper_service.extract_job_description(response.text, job_url)
+
+        if not job_description:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Could not extract job description from this URL. "
+                    "Please try copying the text manually."
+                ),
+            )
+
+        return JSONResponse({"success": True, "job_description": job_description, "url": job_url})
+
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch job posting: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error scraping job: {str(e)}")
 
 
 @app.get("/health")

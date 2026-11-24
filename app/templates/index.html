@@ -457,6 +457,39 @@ PROJECTS:
                     </div>
 
                     <div class="form-group">
+                        <label for="job_url" class="label form-label">
+                            Job URL (Optional)
+                        </label>
+                        <div style="display: flex; gap: 8px;">
+                            <input
+                                type="url"
+                                id="job_url"
+                                name="job_url"
+                                placeholder="Paste job URL from LinkedIn, Indeed, etc."
+                                style="flex: 1; padding: 12px; border-radius: 8px; border: none; box-shadow: var(--shadow-border); font-family: 'Geist', sans-serif; font-size: 14px; color: var(--color-text-primary); background: var(--color-bg); transition: box-shadow 0.2s;"
+                                onfocus="this.style.boxShadow='0px 0px 0px 2px var(--color-accent)'"
+                                onblur="this.style.boxShadow='var(--shadow-border)'"
+                            />
+                            <button
+                                type="button"
+                                id="scrape-btn"
+                                onclick="scrapeJob()"
+                                style="padding: 12px 24px; border-radius: 8px; border: none; background: var(--color-text-primary); color: var(--color-bg); font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap;"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.opacity='0.9'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'"
+                            >
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21 12a9 9 0 1 1-6.219-8.56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span id="scrape-text">Scrape</span>
+                            </button>
+                        </div>
+                        <p style="font-size: 12px; color: var(--color-text-muted); margin-top: 8px;">
+                            Supports: LinkedIn, Indeed, Greenhouse, Lever, and more
+                        </p>
+                    </div>
+
+                    <div class="form-group">
                         <label for="job_description" class="label form-label">
                             Job Description
                         </label>
@@ -579,6 +612,60 @@ Nice to have:
         
         // Make showToast available globally
         window.showToast = showToast;
+        
+        // Job URL scraping
+        async function scrapeJob() {
+            const urlInput = document.getElementById('job_url');
+            const scrapeBtn = document.getElementById('scrape-btn');
+            const scrapeText = document.getElementById('scrape-text');
+            const jobDescTextarea = document.getElementById('job_description');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showToast('Please enter a job URL');
+                urlInput.focus();
+                return;
+            }
+            
+            // Disable button and show loading
+            scrapeBtn.disabled = true;
+            scrapeText.textContent = 'Scraping...';
+            scrapeBtn.style.opacity = '0.6';
+            scrapeBtn.style.cursor = 'not-allowed';
+            
+            try {
+                const response = await fetch('/api/scrape-job', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Fill job description textarea
+                    jobDescTextarea.value = data.job_description;
+                    jobDescTextarea.focus();
+                    showToast('Job description extracted successfully!');
+                } else {
+                    throw new Error(data.detail || 'Failed to scrape job');
+                }
+            } catch (error) {
+                console.error('Scraping error:', error);
+                showToast(error.message || 'Failed to scrape job. Try copying manually.');
+            } finally {
+                // Re-enable button
+                scrapeBtn.disabled = false;
+                scrapeText.textContent = 'Scrape';
+                scrapeBtn.style.opacity = '1';
+                scrapeBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // Make scrapeJob available globally
+        window.scrapeJob = scrapeJob;
     </script>
 </body>
 </html>
