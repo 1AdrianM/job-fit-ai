@@ -427,15 +427,78 @@
                     class="form-card"
                 >
                     <div class="form-group">
-                        <label for="cv" class="label form-label">
+                        <label class="label form-label">
                             Your CV / Resume
                         </label>
-                        <textarea
-                            id="cv"
-                            name="cv"
-                            rows="10"
-                            required
-                            placeholder="Paste your CV here...
+                        
+                        <!-- Upload Method Toggle -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <button
+                                type="button"
+                                id="upload-tab"
+                                onclick="switchCVMethod('upload')"
+                                style="flex: 1; padding: 10px; border-radius: 6px; border: none; background: var(--color-bg-secondary); color: var(--color-text-muted); font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;"
+                            >
+                                📄 Upload File
+                            </button>
+                            <button
+                                type="button"
+                                id="paste-tab"
+                                onclick="switchCVMethod('paste')"
+                                style="flex: 1; padding: 10px; border-radius: 6px; border: none; background: var(--color-text-primary); color: var(--color-bg); font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;"
+                            >
+                                ✏️ Paste Text
+                            </button>
+                        </div>
+
+                        <!-- Upload Method -->
+                        <div id="upload-method" style="display: none;">
+                            <div 
+                                id="drop-zone"
+                                style="border: 2px dashed var(--color-border); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--color-bg);"
+                                onclick="document.getElementById('cv-file-input').click()"
+                                ondragover="event.preventDefault(); this.style.borderColor='var(--color-accent)'; this.style.background='var(--color-bg-secondary)';"
+                                ondragleave="this.style.borderColor='var(--color-border)'; this.style.background='var(--color-bg)';"
+                                ondrop="handleFileDrop(event)"
+                            >
+                                <svg style="width: 48px; height: 48px; margin: 0 auto 16px; color: var(--color-text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p style="font-size: 14px; color: var(--color-text-primary); margin: 0 0 8px;">
+                                    <strong>Click to upload</strong> or drag and drop
+                                </p>
+                                <p style="font-size: 12px; color: var(--color-text-muted); margin: 0;">
+                                    PDF or DOCX (max 5MB)
+                                </p>
+                                <p id="selected-file" style="font-size: 12px; color: var(--color-accent); margin-top: 12px; display: none;"></p>
+                            </div>
+                            <input
+                                type="file"
+                                id="cv-file-input"
+                                accept=".pdf,.docx,.doc"
+                                style="display: none;"
+                                onchange="handleFileSelect(event)"
+                            />
+                            <button
+                                type="button"
+                                id="upload-cv-btn"
+                                onclick="uploadCV()"
+                                style="margin-top: 12px; width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--color-text-primary); color: var(--color-bg); font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: none;"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.opacity='0.9'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.opacity='1'"
+                            >
+                                <span id="upload-cv-text">Upload CV</span>
+                            </button>
+                        </div>
+
+                        <!-- Paste Method -->
+                        <div id="paste-method" style="display: block;">
+                            <textarea
+                                id="cv"
+                                name="cv"
+                                rows="10"
+                                required
+                                placeholder="Paste your CV here...
 
 Example:
 Adrian Mateo
@@ -454,6 +517,10 @@ PROJECTS:
 - Job Fit AI: AI-powered job matching tool"
                             class="form-textarea mono"
                         ></textarea>
+                        </div>
+
+                        <!-- Hidden textarea to store CV text from upload -->
+                        <textarea id="cv-upload-text" name="cv" style="display: none;"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -666,6 +733,130 @@ Nice to have:
         
         // Make scrapeJob available globally
         window.scrapeJob = scrapeJob;
+        
+        // CV Upload functionality
+        let selectedFile = null;
+        
+        function switchCVMethod(method) {
+            const uploadMethod = document.getElementById('upload-method');
+            const pasteMethod = document.getElementById('paste-method');
+            const uploadTab = document.getElementById('upload-tab');
+            const pasteTab = document.getElementById('paste-tab');
+            const cvTextarea = document.getElementById('cv');
+            const cvUploadTextarea = document.getElementById('cv-upload-text');
+            
+            if (method === 'upload') {
+                uploadMethod.style.display = 'block';
+                pasteMethod.style.display = 'none';
+                uploadTab.style.background = 'var(--color-text-primary)';
+                uploadTab.style.color = 'var(--color-bg)';
+                pasteTab.style.background = 'var(--color-bg-secondary)';
+                pasteTab.style.color = 'var(--color-text-muted)';
+                
+                // Enable upload textarea, disable paste textarea
+                cvTextarea.removeAttribute('name');
+                cvTextarea.removeAttribute('required');
+                cvUploadTextarea.setAttribute('name', 'cv');
+                if (cvUploadTextarea.value) {
+                    cvUploadTextarea.setAttribute('required', '');
+                }
+            } else {
+                uploadMethod.style.display = 'none';
+                pasteMethod.style.display = 'block';
+                uploadTab.style.background = 'var(--color-bg-secondary)';
+                uploadTab.style.color = 'var(--color-text-muted)';
+                pasteTab.style.background = 'var(--color-text-primary)';
+                pasteTab.style.color = 'var(--color-bg)';
+                
+                // Enable paste textarea, disable upload textarea
+                cvUploadTextarea.removeAttribute('name');
+                cvUploadTextarea.removeAttribute('required');
+                cvTextarea.setAttribute('name', 'cv');
+                cvTextarea.setAttribute('required', '');
+            }
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                displaySelectedFile(file);
+            }
+        }
+        
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.style.borderColor = 'var(--color-border)';
+            dropZone.style.background = 'var(--color-bg)';
+            
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                displaySelectedFile(file);
+            }
+        }
+        
+        function displaySelectedFile(file) {
+            selectedFile = file;
+            const selectedFileP = document.getElementById('selected-file');
+            const uploadBtn = document.getElementById('upload-cv-btn');
+            
+            selectedFileP.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            selectedFileP.style.display = 'block';
+            uploadBtn.style.display = 'block';
+        }
+        
+        async function uploadCV() {
+            if (!selectedFile) {
+                showToast('Please select a file first');
+                return;
+            }
+            
+            const uploadBtn = document.getElementById('upload-cv-btn');
+            const uploadText = document.getElementById('upload-cv-text');
+            const cvUploadTextarea = document.getElementById('cv-upload-text');
+            
+            // Disable button and show loading
+            uploadBtn.disabled = true;
+            uploadText.textContent = 'Uploading...';
+            uploadBtn.style.opacity = '0.6';
+            uploadBtn.style.cursor = 'not-allowed';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                const response = await fetch('/api/upload-cv', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Fill CV textarea with extracted text
+                    cvUploadTextarea.value = data.cv_text;
+                    cvUploadTextarea.setAttribute('required', '');
+                    showToast(`CV extracted successfully! (${data.filename})`);
+                } else {
+                    throw new Error(data.detail || 'Failed to parse CV');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast(error.message || 'Failed to upload CV. Try paste method.');
+            } finally {
+                // Re-enable button
+                uploadBtn.disabled = false;
+                uploadText.textContent = 'Upload CV';
+                uploadBtn.style.opacity = '1';
+                uploadBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // Make functions available globally
+        window.switchCVMethod = switchCVMethod;
+        window.handleFileSelect = handleFileSelect;
+        window.handleFileDrop = handleFileDrop;
+        window.uploadCV = uploadCV;
     </script>
 </body>
 </html>
