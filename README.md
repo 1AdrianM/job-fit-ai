@@ -150,7 +150,20 @@ MIT License - feel free to use this for your own job search!
 
 ## 🤝 Contributing
 
+We use **Git Flow** branching strategy for organized development.
+
+**Quick start:**
+```bash
+# Start a new feature
+./scripts/gitflow.sh feature start my-feature
+
+# Or read the full guide
+See [GITFLOW.md](GITFLOW.md) for complete documentation
+```
+
 Built as a portfolio project, but PRs welcome! Open an issue first to discuss changes.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 

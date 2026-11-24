@@ -47,7 +47,7 @@ Thumbs.db
 
 # Node.js / Playwright
 node_modules/
-package-lock.json
+# package-lock.json is now tracked for CI/CD caching
 test-results/
 playwright-report/
 playwright/.cache/
